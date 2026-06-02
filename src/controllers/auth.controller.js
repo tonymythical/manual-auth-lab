@@ -17,10 +17,17 @@ const registerPage = (req, res) => {
 
 const register = async (req, res) => {
     const { username, password, confirm, role } = req.body;
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    if (!username || !password || password !== confirm) {
-        return res.redirect("/register?errors=Invalid registration details");
+    if (!username || !password ||!confirm) {
+        return res.redirect("/register?errors=All fields required");
+    }
+
+    if (password !== confirm) {
+        return res.redirect("/register?errors=Passwords do not match");
+    }
+
+    if (role !== "user" && role != "admin") {
+        return res.redirect("/register?errors=Invalid role");
     }
 
     await createUser(username, password, role);
