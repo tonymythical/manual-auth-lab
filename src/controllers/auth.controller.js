@@ -16,6 +16,7 @@ const registerPage = (req, res) => {
 
 const register = async (req, res) => {
     const { username, password, confirm, role } = req.body;
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     if (!username || !password || password !== confirm) {
         return res.redirect("/register?errors=Invalid registration details");
@@ -25,8 +26,12 @@ const register = async (req, res) => {
     res.redirect("/login");
 };
 
+
 const login = async (req, res) => {
     const { username, password } = req.body;
+    
+    const isMatch = await bcrypt.compare(req.body.password, user.password_hash);
+    if (!isMatch) return res.status(401).send("Invalid credentials");
 
     const user = await findUserByUsername(username);
 
