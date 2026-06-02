@@ -1,4 +1,4 @@
-import { createUser, findUserByUsername } from "../services/user.service.js";
+import { createUser, findUserByUsername, validatePassword } from "../services/user.service.js";
 import bcrypt from 'bcrypt';
 
 const loginPage = (req, res) => {
@@ -38,14 +38,25 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     const { username, password } = req.body;
 
-    const isMatch = await bcrypt.compare(req.body.password, user.password_hash);
-    if (!isMatch) return res.status(401).send("Invalid credentials");
+    if (!username || !password) {
+        return res.redirect("/login?errors=All fields required");
+    }
 
     const user = await findUserByUsername(username);
-
-    if (!user || user.password !== password) {
+    if (!user) {
         return res.redirect("/login?errors=Invalid credentials");
     }
+
+    const isValid = await validatePassword(password, user.password);
+    if(!isValid) {
+        return res.redirect("/login?errors=Invalid credentials");
+    }
+
+    req.session.user = {
+        userId: user.userId,
+        username: user.username,
+        role: user.role
+    };
 
     res.redirect("/dashboard");
 };
