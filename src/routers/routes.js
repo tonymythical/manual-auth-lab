@@ -1,7 +1,7 @@
 import express from "express";
 import authCtl from "../controllers/auth.controller.js";
 import pageCtl from "../controllers/page.controller.js";
-import { isLoggedIn, hasRole } from "../controllers/auth.controller.js";
+import { isLoggedIn, hasRole, logout } from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
@@ -32,5 +32,7 @@ router.get('/dashboard', (req, res) => {
 });
 
 router.get("/admin", isLoggedIn, hasRole("admin"), pageCtl.adminPage);
+
+router.get("/logout", logout);
 
 export default router;
