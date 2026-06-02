@@ -1,4 +1,5 @@
 import { createUser, findUserByUsername } from "../services/user.service.js";
+import bcrypt from 'bcrypt';
 
 const loginPage = (req, res) => {
     res.render("login", {
@@ -29,7 +30,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     const { username, password } = req.body;
-    
+
     const isMatch = await bcrypt.compare(req.body.password, user.password_hash);
     if (!isMatch) return res.status(401).send("Invalid credentials");
 
